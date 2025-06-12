@@ -12,22 +12,24 @@ web_agent = Agent(
     model=OpenAIChat(id="gpt-4o"),
     tools=[DuckDuckGoTools()],
     instructions=["Always include sources"],
-    # Store the agent sessions in a sqlite database
     storage=SqliteStorage(table_name="web_agent", db_file=agent_storage),
-    # Adds the current date and time to the instructions
     add_datetime_to_instructions=True,
-    # Adds the history of the conversation to the messages
     add_history_to_messages=True,
-    # Number of history responses to add to the messages
     num_history_responses=5,
-    # Adds markdown formatting to the messages
     markdown=True,
 )
 
 finance_agent = Agent(
     name="Finance Agent",
     model=OpenAIChat(id="gpt-4o"),
-    tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
+    tools=[
+        YFinanceTools(
+            stock_price=True,
+            analyst_recommendations=True,
+            company_info=True,
+            company_news=True
+        )
+    ],
     instructions=["Always use tables to display data"],
     storage=SqliteStorage(table_name="finance_agent", db_file=agent_storage),
     add_datetime_to_instructions=True,
@@ -36,7 +38,10 @@ finance_agent = Agent(
     markdown=True,
 )
 
-app = Playground(agents=[web_agent, finance_agent]).get_app()
+# 🔹 Esta es la app que Uvicorn necesita para Cloud Run
+app = serve_playground_app(Playground(agents=[web_agent, finance_agent]))
 
+# 🔹 Esto solo se ejecuta localmente, no en contenedor
 if __name__ == "__main__":
-    serve_playground_app("playground:app", reload=True)
+    import uvicorn
+    uvicorn.run("playground:app", host="0.0.0.0", port=8080, reload=True)
