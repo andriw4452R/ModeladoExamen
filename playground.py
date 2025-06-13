@@ -52,11 +52,11 @@ def home():
 # 🔹 Esta es la app que Uvicorn necesita para Cloud Run
 app = serve_playground_app(
     Playground(agents=[web_agent, finance_agent]),
-    base_app=base  # ✅ Incluye la ruta raíz en la app
+    base_app=base
 )
 
 # 🔹 Esto solo se ejecuta localmente o en Cloud Run
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8080))
-    uvicorn.run("playground:app", host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
