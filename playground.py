@@ -5,6 +5,8 @@ from agno.storage.sqlite import SqliteStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 
+import os  # 👈 Necesario para leer la variable de entorno
+
 agent_storage: str = "tmp/agents.db"
 
 web_agent = Agent(
@@ -41,8 +43,8 @@ finance_agent = Agent(
 # 🔹 Esta es la app que Uvicorn necesita para Cloud Run
 app = serve_playground_app(Playground(agents=[web_agent, finance_agent]))
 
-# 🔹 Esto solo se ejecuta localmente, no en contenedor
+# 🔹 Esto solo se ejecuta localmente o en Cloud Run
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("playground:app", host="0.0.0.0", port=8080, reload=True)
-    
+    port = int(os.environ.get("PORT", 8080))  # ✅ Toma el puerto de la variable de entorno
+    uvicorn.run("playground:app", host="0.0.0.0", port=port)
