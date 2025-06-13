@@ -45,3 +45,4 @@ app = serve_playground_app(Playground(agents=[web_agent, finance_agent]))
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("playground:app", host="0.0.0.0", port=8080, reload=True)
+    
