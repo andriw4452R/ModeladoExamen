@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
 
-CMD ["uvicorn", "playground:app", "--host=0.0.0.0", "--port=8080"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "playground:app", "--bind=0.0.0.0:8080"]
