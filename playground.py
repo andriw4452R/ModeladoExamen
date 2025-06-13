@@ -42,21 +42,15 @@ finance_agent = Agent(
     markdown=True,
 )
 
-# ✅ App base para manejar la raíz
+# ✅ Ruta raíz
 base = FastAPI()
 
 @base.get("/")
-def home():
+def root():
     return JSONResponse({"message": "¡Backend desplegado con éxito!"})
 
-# 🔹 Esta es la app que Uvicorn necesita para Cloud Run
+# ✅ App combinada
 app = serve_playground_app(
     Playground(agents=[web_agent, finance_agent]),
     base_app=base
 )
-
-# 🔹 Esto solo se ejecuta localmente o en Cloud Run
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("PORT", 8080))
-    uvicorn.run(app, host="0.0.0.0", port=port)
