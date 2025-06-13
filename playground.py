@@ -5,7 +5,9 @@ from agno.storage.sqlite import SqliteStorage
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 
-import os  # 👈 Necesario para leer la variable de entorno
+from fastapi import FastAPI
+from starlette.responses import JSONResponse
+import os
 
 agent_storage: str = "tmp/agents.db"
 
@@ -40,11 +42,21 @@ finance_agent = Agent(
     markdown=True,
 )
 
+# ✅ App base para manejar la raíz
+base = FastAPI()
+
+@base.get("/")
+def home():
+    return JSONResponse({"message": "¡Backend desplegado con éxito!"})
+
 # 🔹 Esta es la app que Uvicorn necesita para Cloud Run
-app = serve_playground_app(Playground(agents=[web_agent, finance_agent]))
+app = serve_playground_app(
+    Playground(agents=[web_agent, finance_agent]),
+    base_app=base  # ✅ Incluye la ruta raíz en la app
+)
 
 # 🔹 Esto solo se ejecuta localmente o en Cloud Run
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8080))  # ✅ Toma el puerto de la variable de entorno
+    port = int(os.environ.get("PORT", 8080))
     uvicorn.run("playground:app", host="0.0.0.0", port=port)
